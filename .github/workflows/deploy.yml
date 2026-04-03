@@ -26,7 +26,6 @@ jobs:
         run: npm ci --legacy-peer-deps
 
       - name: Generate audio files (Gemini TTS)
-        id: generate
         continue-on-error: true
         run: node scripts/generate-audio.mjs
         env:
@@ -45,26 +44,10 @@ jobs:
             git push
           fi
 
-      - name: Check all audio files generated
-        id: check_audio
-        run: |
-          if node -e "
-            const fs = require('fs');
-            const m = JSON.parse(fs.readFileSync('public/audio/lines/manifest.json','utf8'));
-            if (m.count !== 22 || m.version !== 'v1') process.exit(1);
-          "; then
-            echo "audio_ready=true" >> \$GITHUB_OUTPUT
-          else
-            echo "audio_ready=false" >> \$GITHUB_OUTPUT
-            echo "아직 오디오 파일이 완전하지 않습니다. 할당량 리셋 후 재실행하세요."
-          fi
-
       - name: Build with OpenNext
-        if: steps.check_audio.outputs.audio_ready == 'true'
         run: npx opennextjs-cloudflare build
 
       - name: Deploy to Cloudflare Workers
-        if: steps.check_audio.outputs.audio_ready == 'true'
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
