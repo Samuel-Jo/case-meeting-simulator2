@@ -102,6 +102,15 @@ async function main() {
   for (let i = 0; i < ALL_LINES.length; i++) {
     const line = ALL_LINES[i];
     const voiceName = VOICE_MAP[line.role];
+    const fileName = `line_${String(i).padStart(2, '0')}.b64`;
+    const filePath = join(OUTPUT_DIR, fileName);
+
+    // 이미 생성된 파일은 건너뜀 (할당량 절약)
+    if (existsSync(filePath)) {
+      console.log(`[${i + 1}/${ALL_LINES.length}] 이미 존재 — 건너뜀`);
+      continue;
+    }
+
     console.log(`[${i + 1}/${ALL_LINES.length}] ${line.role} (${voiceName}) 생성 중...`);
 
     let audioData;
@@ -111,16 +120,15 @@ async function main() {
         break;
       } catch (err) {
         console.warn(`  재시도 ${attempt + 1}/3: ${err.message}`);
-        if (attempt < 2) await new Promise(r => setTimeout(r, 3000 * (attempt + 1)));
+        if (attempt < 2) await new Promise(r => setTimeout(r, 5000 * (attempt + 1)));
         else throw err;
       }
     }
 
-    const fileName = `line_${String(i).padStart(2, '0')}.b64`;
-    writeFileSync(join(OUTPUT_DIR, fileName), audioData, 'utf8');
+    writeFileSync(filePath, audioData, 'utf8');
 
-    // API rate limit 방지
-    await new Promise(r => setTimeout(r, 800));
+    // API rate limit 방지 (1.2초 간격)
+    await new Promise(r => setTimeout(r, 1200));
   }
 
   writeFileSync(
