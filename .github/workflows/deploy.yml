@@ -21,6 +21,11 @@ jobs:
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
 
+      - name: Generate audio files (Gemini TTS)
+        run: node scripts/generate-audio.mjs
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
       - name: Build with OpenNext
         run: npx opennextjs-cloudflare build
 
