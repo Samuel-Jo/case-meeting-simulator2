@@ -37,7 +37,7 @@ export default function DialogueMessage({ log, stepTitle, isActive }: DialogueMe
           </div>
           <div className="bg-slate-800/90 backdrop-blur-md text-slate-100 px-6 py-4 rounded-[2rem] rounded-tl-none border border-slate-700/50 shadow-inner text-[14px] leading-relaxed relative">
             {log.text}
-            {log.role === '장학사' && (
+            {log.role === '진행자' && (
               <Award size={12} className="absolute top-3 right-5 text-blue-500 opacity-30" />
             )}
           </div>
